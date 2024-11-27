@@ -1,3 +1,4 @@
+// puzzles found at: https://www.technolution.com/career/advent-of-code-2024/
 package technolution
 
 enum Instruction:
@@ -64,6 +65,8 @@ def calculateJumpTargets(program: Program): Option[Map[Int, Int]] = {
 
 def run(program: Program): Option[List[Char]] = {
 
+    val start = System.currentTimeMillis()
+
     val result = new ListBuffer[Char]
 
     val jumpTargets = calculateJumpTargets(program) match
@@ -75,6 +78,12 @@ def run(program: Program): Option[List[Char]] = {
     var pointer = 0
 
     while programCounter < program.length do
+        val currently = System.currentTimeMillis()
+        // TODO remove shortcut.
+        if currently - start > 10_000 then
+            // 10 seconds passed, just give up.
+            return None
+
         program(programCounter) match
             case IncrementValue => memory.put(pointer, memory(pointer) + 1)
             case DecrementValue => memory.put(pointer, memory(pointer) - 1)
@@ -117,7 +126,7 @@ def part1(): Unit = {
                 case None => //skip
                 case Some(p1res) =>
                     if p1res.size == 2 && p1res.head - 2 == p1res.last then
-                        println(p1res)
+                        println(p1res)  // should be List('4', '2')
 
                         val program2 = code2.map(interpretation)
                         println(run(program2))
