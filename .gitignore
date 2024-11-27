@@ -3,3 +3,6 @@
 .vscode
 .metals
 out
+project/target
+project/project/target
+target
