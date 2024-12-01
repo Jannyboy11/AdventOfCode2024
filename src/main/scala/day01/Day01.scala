@@ -3,7 +3,7 @@ package day01
 import scala.io.Source
 
 val source = Source.fromResource("day01.in")
-val input: Seq[(Int, Int)] = source.getLines().map { case s"${one}   ${two}" => (one.toInt, two.toInt) }.toIndexedSeq
+val input: Seq[(Int, Int)] = source.getLines().map { case s"${one}   ${two}" => (one.toInt, two.toInt) }.toSeq
 
 val list1 = input.map(_._1)
 val list2 = input.map(_._2)
