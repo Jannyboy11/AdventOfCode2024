@@ -14,8 +14,9 @@ def solve1(a: Seq[Int], b: Seq[Int]): Int =
     a.sorted.lazyZip(b.sorted).map(difference.tupled).sum
 
 def solve2(a: Seq[Int], b: Seq[Int]): Int =
-    // Instead of having to calculate x * occurrences(x) and having to calculate the occurrences by summing 1's,
-    // we can precompute the score values directly by summing the values themselves.
+    // Instead of having to calculate x * occurrences(x) and having to calculate the occurrences by summing 1s,
+    // we can precompute the score values directly by summing the values themselves. This saves us on multiplications.
+    // We use the following equality: x * (1 + 1 + ... + 1) == x + x + ... + x.
     val scoreValues = b.groupMapReduce(identity)(identity)(Integer.sum).withDefaultValue(0)
     a.map(scoreValues).sum
 
