@@ -8,12 +8,12 @@ val input: Seq[(Int, Int)] = source.getLines().map { case s"${one}   ${two}" => 
 val list1 = input.map(_._1)
 val list2 = input.map(_._2)
 
-def difference(a: Int, b: Int): Int = Math.abs(a - b)
+def distance(a: Int, b: Int): Int = Math.abs(a - b)
 
-def solve1(a: Seq[Int], b: Seq[Int]): Int =
-    a.sorted.lazyZip(b.sorted).map(difference.tupled).sum
+def totalDistance(a: Seq[Int], b: Seq[Int]): Int =
+    a.sorted.lazyZip(b.sorted).map(distance.tupled).sum
 
-def solve2(a: Seq[Int], b: Seq[Int]): Int =
+def similarityScore(a: Seq[Int], b: Seq[Int]): Int =
     // Instead of having to calculate x * occurrences(x) and having to calculate the occurrences by summing 1s,
     // we can precompute the score values directly by summing the values themselves. This saves us on multiplications.
     // We use the following equality: x * (1 + 1 + ... + 1) == x + x + ... + x.
@@ -22,10 +22,10 @@ def solve2(a: Seq[Int], b: Seq[Int]): Int =
 
 @main def main(): Unit = {
 
-    val result1 = solve1(list1, list2)
+    val result1 = totalDistance(list1, list2)
     println(result1)
 
-    val result2 = solve2(list1, list2)
+    val result2 = similarityScore(list1, list2)
     println(result2)
 
 }
