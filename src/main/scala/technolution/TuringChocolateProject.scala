@@ -179,6 +179,28 @@ def part1(): Unit = {
 val part2code1 = "TCTNTNTNTTNTHETCTCTTCTNTCTU_NOCECELNHUN_NEENTETUUN_ONETNTTNIETIU"
 val part2code2 = "TCTTCHNETCTTCTU_OEHUTNTE_OUCELHETCTUC_OEHETETNENTCUCUCU_OUNUHETETETUUCU_OLHETU_ONLNECEH_NUCUC_ECEONUNTCTCIECENE_CIU_INUCUCUCIENECEECETCITCTTTCTCI_C__NELC_NECTCTNTTHUN_C_C_E_NONUHUIE_OUCUCU_N_C__N_C_IECECIUCUUUCUCTI"
 
+def isPlausibleInterpretation2(interpretation: Interpretation): Boolean = {
+    // TCNHEU_OLI
+    val T = interpretation('T')
+    val C = interpretation('C')
+    val N = interpretation('N')
+    val H = interpretation('H')
+    val E = interpretation('E')
+    val U = interpretation('U')
+    val __ = interpretation('_')
+    val O = interpretation('O')
+    val L = interpretation('L')
+    val I = interpretation('I')
+
+    if T == JumpToBeginningOfBlockIfNonZero then return false
+    if U == JumpToEndOfBlockIfZero then return false
+    if C == JumpToBeginningOfBlockIfNonZero then return false
+    if I == JumpToEndOfBlockIfZero then return false
+    if L != Input then return false
+
+    true
+}
+
 trait InputFunction:
     def nextChar(): Option[Char]
 
@@ -301,32 +323,24 @@ def part2(): Unit = {
     val input2 = FixedInput(StdIn.readLine())
 
     val interpretation: Interpretation = boundary {
-        for interpretation <- interpretations2 do
+        for interpretation <- interpretations2 if isPlausibleInterpretation2(interpretation) do
             println(s"Trying interpretation ${interpretation}")
-            val interpU = interpretation('U')
-            val interpT = interpretation('T')
-            val interpC = interpretation('C')
-            val interpN = interpretation('N')
-            if interpT != JumpToBeginningOfBlockIfNonZero &&
-                interpU != JumpToEndOfBlockIfZero &&
-                interpC != JumpToBeginningOfBlockIfNonZero &&
-                interpN != JumpToBeginningOfBlockIfNonZero then
-                    // TODO can we exclude more interpretations (perhaps use some logical Or expressions?)
+            // TODO can we exclude more interpretations (perhaps use some logical Or expressions?)
 
-                    val program1 = part2code1.map(interpretation)
-                    val resultCode1 = run2Code1(program1, Input1)
+            val program1 = part2code1.map(interpretation)
+            val resultCode1 = run2Code1(program1, Input1)
 
-                    resultCode1 match
-                        case None =>
-                        case Some(result1) =>
-                            if result1 == List('4', '2') then
-                                break(interpretation)
-                    end match
-            end if
+            resultCode1 match
+                case None =>
+                case Some(result1) =>
+                    if result1 == List('4', '2') then
+                        break(interpretation)
+            end match
         end for
         ??? // Unreachable
     }
 
+    println(s"Found interpretation! ${interpretation}")
     val program2 = part2code2.map(interpretation)
     println(run2Code2(program2, input2))
 }
