@@ -22,6 +22,7 @@ def dampen(report: Report): Seq[Report] =
 
 def isSafe2(report: Report): Boolean =
     isSafe1(report) || dampen(report).exists(isSafe1)
+    // Possible optimisation: only compute safeDifferences and hasOrdering for unknown suffixes of dampened report.
 
 @main def main(): Unit = {
 
