@@ -3,12 +3,12 @@ package day02
 import scala.io.Source
 
 val source = Source.fromResource("day02.in")
-val input: Seq[Report] = source.getLines().map(s => s.split(" ").map(l => l.toInt).toSeq).toSeq
+val input: Seq[Report] = source.getLines().map(s => s.split(" ").map(_.toInt).toSeq).toSeq
 
 type Report = Seq[Level]
 type Level = Int
 
-def difference(a: Int, b: Int): Int = Math.abs(a - b)
+def difference(a: Level, b: Level): Int = Math.abs(a - b)
 def isSafeDifference(difference: Int): Boolean = 1 <= difference && difference <= 3
 
 def isSafe1(report: Report): Boolean =
