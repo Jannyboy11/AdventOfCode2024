@@ -18,7 +18,7 @@ def isSafe1(report: Report): Boolean =
     hasOrdering && safeDifferences
 
 def dampen(report: Report): Seq[Report] =
-    for i <- report.indices yield report.patch(i, Seq(), 1)
+    for i <- LazyList.from(report.indices) yield report.patch(i, Seq(), 1)
 
 def isSafe2(report: Report): Boolean =
     isSafe1(report) || dampen(report).exists(isSafe1)
