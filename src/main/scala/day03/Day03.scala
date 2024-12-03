@@ -2,7 +2,6 @@ package day03
 
 import fastparse.*
 import fastparse.NoWhitespace.*
-import fastparse.given
 
 import scala.io.Source
 
@@ -22,10 +21,10 @@ def parseMul[$: P]: P[Mul] =
     P("mul(" ~ parseNum ~ "," ~ parseNum ~ ")").map { case (x, y) => Mul(x, y) }
 
 def parseDo[$: P]: P[Do.type] =
-    P("do()").!.map(_ => Do)
+    P("do()").map(_ => Do)
 
 def parseDont[$: P]: P[Dont.type] =
-    P("don't()").!.map(_ => Dont)
+    P("don't()").map(_ => Dont)
 
 // part 1
 def parseMaybeMul[$: P]: P[Mul | Unit] =
