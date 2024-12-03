@@ -21,10 +21,10 @@ def parseNum[$: P]: P[Int] =
 def parseMul[$: P]: P[Mul] =
     P("mul(" ~ parseNum ~ "," ~ parseNum ~ ")").map { case (x, y) => Mul(x, y) }
 
-def parseDo[$: P]: P[Instruction] =
+def parseDo[$: P]: P[Do.type] =
     P("do()").!.map(_ => Do)
 
-def parseDont[$: P]: P[Instruction] =
+def parseDont[$: P]: P[Dont.type] =
     P("don't()").!.map(_ => Dont)
 
 // part 1
