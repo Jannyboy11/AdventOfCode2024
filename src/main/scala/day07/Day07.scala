@@ -3,16 +3,6 @@ package day07
 import scala.annotation.tailrec
 import scala.io.Source
 
-val testInput = """190: 10 19
-                  |3267: 81 40 27
-                  |83: 17 5
-                  |156: 15 6
-                  |7290: 6 8 6 15
-                  |161011: 16 10 13
-                  |192: 17 8 14
-                  |21037: 9 7 18 13
-                  |292: 11 6 16 20""".stripMargin
-
 val source = Source.fromResource("day07.in")
 val input: Seq[Equation] = source.getLines().map {
     case s"${testValue}: ${operands}" => (testValue.toLong, operands.split(" ").map(_.toLong).toSeq)
@@ -63,7 +53,7 @@ def operatorCombinations2(size: Int): Seq[Seq[Operator]] = {
     if size == 0 then
         LazyList(LazyList.empty)
     else
-        val tails = operatorCombinations1(size - 1)
+        val tails = operatorCombinations2(size - 1)
         tails.map(tail => Operator.Add +: tail) ++
             tails.map(tail => Operator.Multiply +: tail) ++
             tails.map(tail => Operator.Concatenate +: tail)
@@ -84,6 +74,6 @@ def calibrationResult2(equations: Seq[Equation]): Long =
     println(result1)
 
     val result2 = calibrationResult2(input)
-    println(result2) //15916264547402 too low
+    println(result2)
 
 }
