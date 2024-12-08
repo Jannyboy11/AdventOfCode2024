@@ -14,8 +14,6 @@ case class Point(x: Int, y: Int):
 case class Difference(x: Int, y:Int)
 extension (grid: Grid)
     def apply(x: Int, y: Int): Tile = grid(y)(x)
-    def apply(point: Point): Option[Tile] = point match
-        case Point(x, y) => if 0 <= x && x < grid(0).size && 0 <= y && y < grid.size then Some(apply(x, y)) else None
 
 type Antenna = Char
 def isAntenna(tile: Tile): Boolean =
