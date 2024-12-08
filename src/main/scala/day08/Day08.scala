@@ -3,8 +3,7 @@ package day08
 import scala.io.Source
 
 val source = Source.fromResource("day08.in")
-val input: Grid = source.getLines()
-    .map(line => line.toIndexedSeq).toIndexedSeq
+val input: Grid = source.getLines().map(line => line.toIndexedSeq).toIndexedSeq
 
 type Tile = Char
 type Grid = IndexedSeq[IndexedSeq[Tile]]
