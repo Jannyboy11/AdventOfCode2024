@@ -2,24 +2,6 @@ package day04
 
 import scala.io.Source
 
-val testInput1 = """..X...
-                   |.SAMX.
-                   |.A..A.
-                   |XMAS.S
-                   |.X....""".stripMargin
-
-val testInput2 =
-    """MMMSXXMASM
-      |MSAMXMSMSA
-      |AMXSXMAAMM
-      |MSAMASMSMX
-      |XMASAMXAMM
-      |XXAMMXXAMA
-      |SMSMSASXSS
-      |SAXAMASAAA
-      |MAMMMXMMMM
-      |MXMXAXMASX""".stripMargin    //output: 19. expected: 18.
-
 val source = Source.fromResource("day04.in")
 val input: Matrix = source.getLines().map(_.toSeq).toSeq
 
