@@ -1,6 +1,5 @@
 package day05
 
-import scala.collection.mutable
 import scala.io.Source
 
 val source = Source.fromResource("day05.in")
@@ -25,16 +24,8 @@ def middleElement(update: Update): Int = update(update.size / 2)
 
 type Order = Map[Int, Set[Int]]
 
-def buildOrder(orderings: Seq[Ordering]): Order = {
-    val res = mutable.Map.empty[Int, Set[Int]]
-    for (before, after) <- orderings do
-        res.updateWith(before) {
-            case None => Some(Set(after))
-            case Some(values) => Some(values + after)
-        }
-    end for
-    res.toMap
-}
+def buildOrder(orderings: Seq[Ordering]): Order =
+    orderings.groupMapReduce((before, _) => before)((_, after) => Set(after))(_ union _)
 
 def isInOrder(one: Int, two: Int, order: Order): Boolean = order.get(two) match
     case None => true
@@ -42,7 +33,7 @@ def isInOrder(one: Int, two: Int, order: Order): Boolean = order.get(two) match
 
 def isInOrder(update: Update, order: Order): Boolean = update match
     case Seq() => true
-    case h +: tail => isInOrder(tail, order) && tail.forall(afterElem => isInOrder(h, afterElem, order))
+    case head +: tail => isInOrder(tail, order) && tail.forall(tailElem => isInOrder(head, tailElem, order))
 
 def fixUpdateOrdering(update: Update, order: Order): Update =
     update.sortWith((one, two) => order.get(one) match { case None => true; case Some(set) => set.contains(two) })
