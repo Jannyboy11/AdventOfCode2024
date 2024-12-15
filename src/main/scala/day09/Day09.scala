@@ -1,12 +1,7 @@
 package day09
 
-import day09.Fragment.{File, FreeSpace}
-
 import scala.collection.mutable
 import scala.io.Source
-
-//val testInput = "12345".map(_ - '0').toIndexedSeq
-val testInput = "2333133121414131402".map(_ - '0').toIndexedSeq
 
 val source = Source.fromResource("day09.in")
 val input: Seq[Int] = source.map(_ - '0').toIndexedSeq
@@ -14,21 +9,15 @@ val input: Seq[Int] = source.map(_ - '0').toIndexedSeq
 type ID = Int
 type BlockSize = Int
 enum Fragment:
-    case File(index: Int, id: ID, size: BlockSize)
-    case FreeSpace(index: Int, size: BlockSize)
+    case File(id: ID, size: BlockSize)
+    case FreeSpace(size: BlockSize)
 
 type Disk = Seq[Fragment]
 
 def parseDisk(diskMap: Seq[Int]): Disk = diskMap.zipWithIndex
     .map:
-        case (size, index) => if index % 2 == 0 then Fragment.File(index, index / 2, size) else Fragment.FreeSpace(index, size)
-    .filter { case Fragment.FreeSpace(_, 0) => false; case _ => true }
-
-// for debugging
-def diskToString(disk: Disk): String = disk.flatMap {
-    case Fragment.FreeSpace(index, size) => ".".repeat(size)
-    case Fragment.File(index, id, size) => s"$id".repeat(size)
-}.mkString
+        case (size, index) => if index % 2 == 0 then Fragment.File(index / 2, size) else Fragment.FreeSpace(size)
+    .filter { case Fragment.FreeSpace(0) => false; case _ => true }
 
 def defragment1(disk: Disk): Disk = {
     val deque = scala.collection.mutable.ArrayDeque.from(disk)
@@ -41,21 +30,21 @@ def defragment1(disk: Disk): Disk = {
 
     while { moveRemoveIndex(); removeIndex } > { moveInsertIndex(); insertIndex } do
         deque(removeIndex) match
-            case Fragment.FreeSpace(_, _) =>
+            case Fragment.FreeSpace(_) =>
                 removeIndex -= 1
-            case file @ Fragment.File(fileIdx, fileId, fileSize) =>
-                val Fragment.FreeSpace(freeSpaceIdx, availableSize) = deque(insertIndex): @unchecked
+            case file @ Fragment.File(fileId, fileSize) =>
+                val Fragment.FreeSpace(availableSize) = deque(insertIndex): @unchecked
 
                 if fileSize < availableSize then
                     deque.patchInPlace(removeIndex, Seq(), 1)   // not necessary to put a Fragment.FreeSpace back
-                    deque.patchInPlace(insertIndex, Seq(file, Fragment.FreeSpace(freeSpaceIdx, availableSize - fileSize)), 1)
+                    deque.patchInPlace(insertIndex, Seq(file, Fragment.FreeSpace(availableSize - fileSize)), 1)
                 else if fileSize == availableSize then
                     deque.patchInPlace(removeIndex, Seq(), 1)   // not necessary to put a Fragment.FreeSpace back
                     deque.patchInPlace(insertIndex, Seq(file), 1)
                     removeIndex -= 1
                 else
-                    deque.patchInPlace(removeIndex, Seq(Fragment.File(fileIdx, fileId, fileSize - availableSize)), 1)
-                    deque.patchInPlace(insertIndex, Seq(Fragment.File(fileIdx, fileId, availableSize)), 1)
+                    deque.patchInPlace(removeIndex, Seq(Fragment.File(fileId, fileSize - availableSize)), 1)
+                    deque.patchInPlace(insertIndex, Seq(Fragment.File(fileId, availableSize)), 1)
                 end if
         end match
     end while
@@ -70,9 +59,9 @@ def filesystemChecksum(disk: Disk): Long = {
 
     while index < disk.size do
         disk(index) match
-            case Fragment.FreeSpace(_, size) =>
+            case Fragment.FreeSpace(size) =>
                 position += size
-            case Fragment.File(_, id, size) =>
+            case Fragment.File(id, size) =>
                 var i = 0
                 while i < size do
                     sum += position * id
@@ -88,13 +77,40 @@ def filesystemChecksum(disk: Disk): Long = {
 }
 
 def defragment2(disk: Disk): Disk = {
+    // Possible optimisation: keep track of FreeSpace in a Map-like structure.
+    type Index = Int
 
-    
+    val deque = scala.collection.mutable.ArrayDeque.from(disk)
 
+    def getInsertIndex(requiredSize: BlockSize, lastIdx: Index): Option[Index] = {
+        var insertIndex = 0
+        while insertIndex < lastIdx && (deque(insertIndex) match { case Fragment.FreeSpace(size) if size >= requiredSize => false; case _ => true }) do insertIndex += 1
+        if insertIndex == lastIdx then None else Some(insertIndex)
+    }
 
+    var removeIdx = deque.size - 1
+    while removeIdx > 0 do
+        deque(removeIdx) match
+            case Fragment.FreeSpace(_) => // nothing to do. we don't want to move free space.
+                removeIdx -= 1
+            case file @ Fragment.File(_, fileSize) =>
+                getInsertIndex(fileSize, removeIdx) match
+                    case Some(freeSpaceIndex) =>
+                        val Fragment.FreeSpace(availableSize) = deque(freeSpaceIndex): @unchecked
+                        deque.patchInPlace(removeIdx, Seq(Fragment.FreeSpace(fileSize)), 1)
+                        if fileSize < availableSize then
+                            deque.patchInPlace(freeSpaceIndex, Seq(file, Fragment.FreeSpace(availableSize - fileSize)), 1)
+                        else if fileSize == availableSize then
+                            deque.patchInPlace(freeSpaceIndex, Seq(file), 1)
+                            removeIdx -= 1
+                        end if
+                    case None => // nothing to do. don't move file.
+                        removeIdx -= 1
+                end match
+        end match
+    end while
 
-
-    ???
+    deque.toSeq
 }
 
 @main def main(): Unit = {
@@ -104,7 +120,7 @@ def defragment2(disk: Disk): Disk = {
     val result1 = filesystemChecksum(defragment1(disk))
     println(result1)
 
-    val result2 = filesystemChecksum(defragment2(parseDisk(testInput)))
+    val result2 = filesystemChecksum(defragment2(disk))
     println(result2)
 
 }
